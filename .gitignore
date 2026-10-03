@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Environments
+.venv/
+venv/
+.env
+
+# Tests and caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Data and artifacts
+data/raw/
+data/processed/
+data/demo/generated/
+artifacts/
+checkpoints/
+*.pt
+*.pth
+*.safetensors
+*.ckpt
+*.log
+
+# Model and runtime caches
+.cache/
+wandb/
+runs/
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Keep demo fixtures that are intentionally committed
+!data/demo/
+!data/demo/README.md
+!data/demo/sample_cases.jsonl

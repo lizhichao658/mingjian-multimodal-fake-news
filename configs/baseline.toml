@@ -1,0 +1,22 @@
+[data]
+train_jsonl = "data/processed/train.jsonl"
+val_jsonl = "data/processed/val.jsonl"
+test_jsonl = "data/processed/test.jsonl"
+text_max_length = 196
+image_size = 224
+
+[model]
+text_encoder = "hfl/chinese-roberta-wwm-ext"
+image_encoder = "google/vit-base-patch16-224"
+hidden_dim = 512
+dropout = 0.2
+freeze_encoders = true
+
+[training]
+seed = 42
+batch_size = 8
+learning_rate = 2.0e-6
+weight_decay = 0.01
+epochs = 5
+num_workers = 0
+mixed_precision = true
