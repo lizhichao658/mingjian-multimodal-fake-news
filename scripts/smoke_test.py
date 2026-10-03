@@ -12,11 +12,11 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-import numpy as np  # noqa: E402
+import numpy as np
 
-from mingjian.data.dataset import read_jsonl, write_jsonl  # noqa: E402
-from mingjian.data.schema import NewsSample  # noqa: E402
-from mingjian.evaluation.metrics import binary_classification_metrics  # noqa: E402
+from mingjian.data.dataset import read_jsonl, write_jsonl
+from mingjian.data.schema import NewsSample
+from mingjian.evaluation.metrics import binary_classification_metrics
 
 
 def main() -> int:
@@ -52,9 +52,9 @@ def main() -> int:
         print("      SKIP: PyTorch is not installed")
         return 0
 
-    import torch  # noqa: E402
+    import torch
 
-    from mingjian.models.baseline import TinyTextImageBaseline  # noqa: E402
+    from mingjian.models.baseline import TinyTextImageBaseline
 
     model = TinyTextImageBaseline(vocab_size=64, text_embed_dim=16, hidden_dim=8)
     output = model(torch.randint(1, 64, (2, 7)), torch.randn(2, 3, 16, 16))

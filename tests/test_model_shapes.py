@@ -4,7 +4,7 @@ import pytest
 
 torch = pytest.importorskip("torch")
 
-from mingjian.models.baseline import FeatureFusionBaseline, TinyTextImageBaseline  # noqa: E402
+from mingjian.models.baseline import FeatureFusionBaseline, TinyTextImageBaseline
 
 
 def test_feature_fusion_baseline_shapes() -> None:

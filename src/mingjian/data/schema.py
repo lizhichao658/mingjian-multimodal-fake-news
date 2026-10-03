@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass, field
-from typing import Any, Mapping
+from typing import Any
 
 VALID_LABELS = frozenset({0, 1})
 VALID_SPLITS = frozenset({"train", "val", "test"})
@@ -39,10 +40,10 @@ class NewsSample:
         if self.split not in VALID_SPLITS:
             raise ValueError(f"split must be one of {sorted(VALID_SPLITS)}")
         if not isinstance(self.metadata, dict):
-            raise ValueError("metadata must be a dict")
+            raise TypeError("metadata must be a dict")
 
     @classmethod
-    def from_dict(cls, raw: Mapping[str, Any]) -> "NewsSample":
+    def from_dict(cls, raw: Mapping[str, Any]) -> NewsSample:
         if not isinstance(raw, Mapping):
             raise TypeError("sample must be a mapping")
         metadata = raw.get("metadata", {})

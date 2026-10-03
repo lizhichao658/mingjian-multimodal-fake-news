@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
 try:
     import tomllib
@@ -21,7 +22,7 @@ class DataConfig:
     image_size: int = 224
 
     @classmethod
-    def from_mapping(cls, values: Mapping[str, Any] | None) -> "DataConfig":
+    def from_mapping(cls, values: Mapping[str, Any] | None) -> DataConfig:
         values = values or {}
         return cls(
             train_jsonl=str(values.get("train_jsonl", cls.train_jsonl)),
@@ -41,7 +42,7 @@ class ModelConfig:
     freeze_encoders: bool = True
 
     @classmethod
-    def from_mapping(cls, values: Mapping[str, Any] | None) -> "ModelConfig":
+    def from_mapping(cls, values: Mapping[str, Any] | None) -> ModelConfig:
         values = values or {}
         return cls(
             text_encoder=str(values.get("text_encoder", cls.text_encoder)),
@@ -63,7 +64,7 @@ class TrainingConfig:
     mixed_precision: bool = True
 
     @classmethod
-    def from_mapping(cls, values: Mapping[str, Any] | None) -> "TrainingConfig":
+    def from_mapping(cls, values: Mapping[str, Any] | None) -> TrainingConfig:
         values = values or {}
         return cls(
             seed=int(values.get("seed", cls.seed)),
@@ -83,7 +84,7 @@ class AppConfig:
     training: TrainingConfig
 
     @classmethod
-    def from_mapping(cls, values: Mapping[str, Any] | None) -> "AppConfig":
+    def from_mapping(cls, values: Mapping[str, Any] | None) -> AppConfig:
         values = values or {}
         return cls(
             data=DataConfig.from_mapping(values.get("data")),
