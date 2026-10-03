@@ -6,6 +6,8 @@ from collections.abc import Sequence
 
 import numpy as np
 
+from mingjian.labels import LABEL_FAKE, LABEL_REAL
+
 
 def _as_arrays(
     y_true: Sequence[int] | np.ndarray,
@@ -17,7 +19,7 @@ def _as_arrays(
         raise ValueError("y_true and y_score must have the same shape")
     if labels.size == 0:
         raise ValueError("metrics require at least one sample")
-    if not np.isin(labels, [0, 1]).all():
+    if not np.isin(labels, [LABEL_REAL, LABEL_FAKE]).all():
         raise ValueError("y_true must contain only 0 and 1")
     if not np.isfinite(scores).all():
         raise ValueError("y_score must contain finite values")
@@ -44,7 +46,7 @@ def _roc_auc(labels: np.ndarray, scores: np.ndarray) -> float:
         ranks[order[start : end + 1]] = average_rank
         start = end + 1
 
-    rank_sum = float(ranks[labels == 1].sum())
+    rank_sum = float(ranks[labels == LABEL_FAKE].sum())
     return (rank_sum - positive_count * (positive_count + 1) / 2.0) / (
         positive_count * negative_count
     )
@@ -59,18 +61,18 @@ def binary_classification_metrics(
     y_score: Sequence[float] | np.ndarray,
     threshold: float = 0.5,
 ) -> dict[str, float | int | dict[str, int]]:
-    """Return common binary metrics for fake(0)/real(1) predictions.
+    """Return common binary metrics for real(0)/fake(1) predictions.
 
-    ``y_score`` is interpreted as P(real). Set ``threshold`` accordingly.
+    ``y_score`` is interpreted as P(fake). Set ``threshold`` accordingly.
     """
 
     labels, scores = _as_arrays(y_true, y_score)
     predictions = (scores >= threshold).astype(np.int64)
 
-    tp = int(((predictions == 1) & (labels == 1)).sum())
-    tn = int(((predictions == 0) & (labels == 0)).sum())
-    fp = int(((predictions == 1) & (labels == 0)).sum())
-    fn = int(((predictions == 0) & (labels == 1)).sum())
+    tp = int(((predictions == LABEL_FAKE) & (labels == LABEL_FAKE)).sum())
+    tn = int(((predictions == LABEL_REAL) & (labels == LABEL_REAL)).sum())
+    fp = int(((predictions == LABEL_FAKE) & (labels == LABEL_REAL)).sum())
+    fn = int(((predictions == LABEL_REAL) & (labels == LABEL_FAKE)).sum())
 
     precision = _safe_divide(tp, tp + fp)
     recall = _safe_divide(tp, tp + fn)

@@ -21,7 +21,7 @@ class ModelOutput:
 
 
 class FeatureFusionBaseline(nn.Module):
-    """Concatenate pooled text/image features and classify fake(0)/real(1)."""
+    """Concatenate pooled text/image features and classify real(0)/fake(1)."""
 
     def __init__(
         self,

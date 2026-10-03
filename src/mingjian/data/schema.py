@@ -6,7 +6,9 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import Any
 
-VALID_LABELS = frozenset({0, 1})
+from mingjian.labels import LABEL_FAKE, LABEL_REAL
+
+VALID_LABELS = frozenset({LABEL_REAL, LABEL_FAKE})
 VALID_SPLITS = frozenset({"train", "val", "test"})
 
 
@@ -14,7 +16,7 @@ VALID_SPLITS = frozenset({"train", "val", "test"})
 class NewsSample:
     """A single text-image news sample.
 
-    label: 0 = fake, 1 = real.
+    label: 0 = real/non-rumor, 1 = fake/rumor (EANN Weibo17).
     """
 
     sample_id: str
@@ -36,7 +38,7 @@ class NewsSample:
         if not isinstance(self.image_path, str) or not self.image_path.strip():
             raise ValueError("image_path must be a non-empty string")
         if self.label not in VALID_LABELS:
-            raise ValueError("label must be 0 (fake) or 1 (real)")
+            raise ValueError("label must be 0 (real) or 1 (fake)")
         if self.split not in VALID_SPLITS:
             raise ValueError(f"split must be one of {sorted(VALID_SPLITS)}")
         if not isinstance(self.metadata, dict):
