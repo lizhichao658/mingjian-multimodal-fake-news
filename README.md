@@ -63,7 +63,13 @@ python -m pip install --upgrade pip
 python -m pip install -e ".[dev]"
 ```
 
-GPU 环境请按 CUDA 版本安装对应 PyTorch，再执行 `pip install -e ".[dev]"`。
+GPU 环境（本机 RTX 5060 Laptop 建议 CUDA 12.8）：
+
+```powershell
+.\scripts\install_gpu_cu128.ps1
+```
+
+其他 GPU 型号请按显卡架构和驱动选择对应 CUDA 版本的 PyTorch，再执行 `pip install -e ".[dev]"`。
 
 ## 5. 目录结构
 
