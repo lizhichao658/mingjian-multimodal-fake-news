@@ -28,6 +28,13 @@ def resolve_device(requested: str | torch.device) -> torch.device:
     return device
 
 
+def _validate_threshold(value: float, *, name: str) -> float:
+    threshold = float(value)
+    if not 0.0 < threshold < 1.0:
+        raise ValueError(f"{name} must be in (0, 1)")
+    return threshold
+
+
 @dataclass
 class LitePredictor:
     """Load one lite checkpoint and expose a compact explanation API."""
@@ -35,6 +42,7 @@ class LitePredictor:
     model: LiteFusionClassifier
     tokenizer: CharTokenizer
     threshold: float
+    decision_threshold: float
     device: torch.device
     image_size: int
     metadata: dict[str, Any]
@@ -47,12 +55,17 @@ class LitePredictor:
         tokenizer_path: str | Path | None = None,
         device: str | torch.device = "auto",
         image_size: int = 128,
+        decision_threshold: float = 0.5,
     ) -> LitePredictor:
         checkpoint_file = Path(checkpoint_path)
         if not checkpoint_file.is_file():
             raise FileNotFoundError(f"checkpoint not found: {checkpoint_file}")
         if image_size <= 0:
             raise ValueError("image_size must be positive")
+        decision_threshold = _validate_threshold(
+            decision_threshold,
+            name="decision_threshold",
+        )
 
         resolved_device = resolve_device(device)
         try:
@@ -76,9 +89,10 @@ class LitePredictor:
         model.load_state_dict(state_dict)
         model.to(resolved_device)
         model.eval()
-        threshold = float(payload.get("threshold", 0.5))
-        if not 0.0 < threshold < 1.0:
-            raise ValueError("checkpoint threshold must be in (0, 1)")
+        checkpoint_threshold = _validate_threshold(
+            payload.get("threshold", 0.5),
+            name="checkpoint threshold",
+        )
         metadata = {
             key: value
             for key, value in payload.items()
@@ -87,7 +101,8 @@ class LitePredictor:
         return cls(
             model=model,
             tokenizer=tokenizer,
-            threshold=threshold,
+            threshold=checkpoint_threshold,
+            decision_threshold=decision_threshold,
             device=resolved_device,
             image_size=int(image_size),
             metadata=metadata,
@@ -100,9 +115,15 @@ class LitePredictor:
         image_path: str | Path | None = None,
         sample_id: str = "",
         top_k: int = 12,
+        decision_threshold: float | None = None,
     ) -> dict[str, Any]:
         """Analyze one text/image pair and return JSON-ready evidence."""
 
+        active_threshold = (
+            self.decision_threshold
+            if decision_threshold is None
+            else _validate_threshold(decision_threshold, name="decision_threshold")
+        )
         image = None
         if image_path is not None and str(image_path).strip():
             image = load_image_tensor(image_path, self.image_size)
@@ -111,16 +132,16 @@ class LitePredictor:
             self.tokenizer,
             device=self.device,
             image_size=self.image_size,
-            threshold=self.threshold,
+            threshold=active_threshold,
             top_k=top_k,
         )
         result = explainer.explain(text, image=image, sample_id=sample_id or "adhoc")
         result["model"] = {
             "checkpoint_threshold": self.threshold,
+            "decision_threshold": active_threshold,
             "device": str(self.device),
             "image_size": self.image_size,
             "image_provided": image is not None,
             "metadata": self.metadata,
         }
         return result
-

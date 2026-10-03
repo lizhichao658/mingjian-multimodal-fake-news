@@ -49,9 +49,16 @@ def test_lite_predictor_loads_checkpoint_and_explains_missing_image(tmp_path) ->
     result = predictor.analyze("abc", sample_id="missing-image")
 
     assert result["model"]["image_provided"] is False
-    assert result["decision"]["threshold"] == 0.4
+    assert result["model"]["checkpoint_threshold"] == 0.4
+    assert result["model"]["decision_threshold"] == 0.5
+    assert result["decision"]["threshold"] == 0.5
     assert result["model"]["metadata"]["git_commit"] == "test"
     assert json.dumps(result, ensure_ascii=False)
+
+    override = predictor.analyze("abc", decision_threshold=0.4)
+    assert override["model"]["checkpoint_threshold"] == 0.4
+    assert override["model"]["decision_threshold"] == 0.4
+    assert override["decision"]["threshold"] == 0.4
 
 
 def test_lite_predictor_loads_local_image(tmp_path) -> None:
