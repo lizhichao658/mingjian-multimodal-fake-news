@@ -1,0 +1,29 @@
+# MingJian lite MVP - pinned runtime for reproducible installs
+# Source environment: Python 3.13.15 on Windows 11, verified 2026-10-03
+# Regenerate with: .\.venv\Scripts\python.exe -m pip freeze > requirements.lock
+#
+# GPU (CUDA 12.8) wheels were installed from the PyTorch index:
+#   --index-url https://download.pytorch.org/whl/cu128
+# CPU-only machines should install plain torch/torchvision (drop the +cu128 tag).
+#
+# --- core runtime (pyproject [project].dependencies) ---
+numpy==2.5.2
+pandas==3.0.6
+pillow==12.3.0
+torch==2.11.0+cu128
+torchvision==0.26.0+cu128
+transformers==5.18.0
+#
+# --- dev tooling (pyproject [project.optional-dependencies].dev) ---
+pytest==9.1.1
+ruff==0.16.10
+#
+# --- key transitive pins observed in the verified environment ---
+tokenizers==0.23.2
+safetensors==0.8.0
+huggingface-hub==1.33.0
+regex==2026.9.29
+filelock==3.32.3
+packaging==26.3
+pyyaml==6.0.3
+tqdm==4.70.1

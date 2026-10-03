@@ -77,6 +77,15 @@ python -m pytest tests
 python scripts\smoke_test.py
 ```
 
+已锁定版本的复现安装（推荐用于评审复现，见 `requirements.lock`）：
+
+```powershell
+python -m pip install -r requirements.lock
+python -m pip install -e . --no-deps
+```
+
+`requirements.lock` 记录的是本机验证过的精确版本（含 CUDA 12.8 的 torch/torchvision）。纯 CPU 机器请把 `torch==2.11.0+cu128`、`torchvision==0.26.0+cu128` 换成不带 `+cu128` 的对应版本。
+
 GPU 环境（本机 RTX 5060 Laptop 建议 CUDA 12.8）：
 
 ```powershell
