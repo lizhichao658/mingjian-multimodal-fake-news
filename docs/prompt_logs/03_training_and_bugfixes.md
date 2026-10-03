@@ -110,7 +110,7 @@ AI 建议的训练闭环：
 ### 现象 A
 
 - 测试最初假设 Grad-CAM 输出为 `2×2`；
-- 实际图像编码器经过 4 层 stride-2 卷积，128×128 输入得到 `4×4` 特征图。
+- 小测试模型（16×16 输入）实际得到 `4×4` 特征图；真实 MVP 模型（128×128 输入，4 层 stride-2 卷积）得到 `8×8` 特征图。
 
 ### 根因
 
@@ -141,7 +141,30 @@ AI 建议的训练闭环：
 
 ---
 
-## 6. 真实训练结果
+## 6. 真实 Bug 4：检查点阈值与推理决策阈值不一致
+
+### 现象
+
+- `artifacts/lite_v1/model.pt` 里记录的调优阈值是 `0.05`（验证集搜索得到）；
+- 推理脚本直接拿 `0.05` 当决策阈值，而 README 和模型卡却声明默认使用更稳健的 `0.5`；
+- 结果是“文档说一套、实际跑一套”，同一句话可能因为阈值不同得到不同结论。
+
+### 根因
+
+- 检查点只存了一个阈值字段，没有区分“审计用途的检查点阈值”和“实际决策阈值”；
+- 文档更新后没有回归校验推理输出里的阈值字段。
+
+### 修复
+
+- `LitePredictor` 拆分 `threshold`（检查点记录的阈值，仅审计）和 `decision_threshold`（实际决策阈值，默认 `0.5`）；
+- `analyze(..., decision_threshold=None)` 支持临时覆盖，输出同时给出 `checkpoint_threshold`、`decision_threshold` 和 `decision.threshold`；
+- 更新 `tests/test_lite_predictor.py`，断言默认决策阈值 `0.5`、检查点阈值 `0.4`，并验证显式覆盖；
+- 真实 CLI 验收：`decision.threshold == 0.5`、`checkpoint_threshold == 0.05`、`decision_threshold == 0.5`；
+- 关联提交 `3f5a50a`。
+
+---
+
+## 7. 真实训练结果
 
 训练命令：
 
@@ -168,13 +191,13 @@ AI 建议的训练闭环：
 ### 人工判断
 
 - 保留完整训练历史，不删除后期高验证损失；
-- 默认工作台阈值仍用 `0.5`，不采用无法稳定外推的 `0.05`；
+- 默认工作台阈值仍用 `0.5`，不采用无法稳定外推的 `0.05`，并由 `LitePredictor.decision_threshold=0.5` 固化、回归测试兜底（见第 6 节）；
 - 在模型卡和 README 中明确概率未充分校准；
 - 不因为 AUC 尚可就声称跨域泛化已经解决。
 
 ---
 
-## 7. 回归测试与验证命令
+## 8. 回归测试与验证命令
 
 ```powershell
 .\.venv\Scripts\python.exe -m pytest tests\test_lite_model.py tests\test_lite_explainer.py tests\test_train_script.py `
@@ -211,6 +234,6 @@ All checks passed!
 
 ---
 
-## 8. 结论
+## 9. 结论
 
 本链展示了从“可运行”到“可解释”的真实迭代：AI 负责提出训练结构与修复方向，人工负责识别类别偏置、核实 padding mask、拒绝阈值幻觉、保留失败结果。第一轮模型已经能用于 MVP 演示，但概率校准、过拟合和跨域泛化仍需第二轮实验。
