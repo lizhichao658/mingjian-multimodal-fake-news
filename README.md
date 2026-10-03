@@ -1,7 +1,7 @@
 # 明鉴（MingJian）
 
 > 多模态虚假新闻检测与可解释审核工作台。
-> 当前阶段：M1 仓库骨架与 baseline 冒烟测试。
+> 当前阶段：M1 仓库骨架完成，CUDA 12.8 环境与 baseline 冒烟测试已验证。
 
 ## 1. 项目定位
 
@@ -31,12 +31,12 @@
 - JSONL 数据读写工具；
 - 二分类与校准评测指标；
 - PyTorch 特征融合 baseline；
-- 可跳过大依赖的冒烟测试；
+- 可跳过大依赖的冒烟测试；`r`n- CUDA 12.8 / RTX 5060 环境验证；
 - 项目章程、数据卡/模型卡模板、Prompt 留痕模板。
 
 尚未完成：
 
-- 依赖环境安装与锁定；
+- 跨平台依赖锁文件与离线复现包；
 - 真实数据集接入；
 - 文本/图像编码器接入；
 - 双通道跨模态交互模型；
@@ -66,7 +66,7 @@ python -m pip install -e ".[dev]"
 GPU 环境（本机 RTX 5060 Laptop 建议 CUDA 12.8）：
 
 ```powershell
-.\scripts\install_gpu_cu128.ps1
+.\scripts\install_gpu_cu128.ps1 -BypassProxy
 ```
 
 其他 GPU 型号请按显卡架构和驱动选择对应 CUDA 版本的 PyTorch，再执行 `pip install -e ".[dev]"`。
