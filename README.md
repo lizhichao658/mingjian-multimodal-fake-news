@@ -6,10 +6,24 @@
 ## 仓库与提交材料
 
 - 公开仓库：https://github.com/lizhichao658/mingjian-multimodal-fake-news
-- 技术文档：已导出 15 页 PDF；架构图与页面截图补齐后重导出。
+- 技术文档：已导出 19 页 PDF v1.0；总体架构图与工作台真实截图已补齐。
 - AI 协同留痕：`docs/prompt_logs/` 已归档 3 条过程记录；原始 AI 对话导出/截图待补。
 - 演示视频：5–8 分钟、1080p MP4，待录制。
 - 独立干净环境 10 分钟复现：待实测。
+
+## 技术文档与界面证据
+
+- 系统总体架构图：`docs/figures/architecture.png`
+- 工作台初始页：`docs/figures/workspace-home.png`
+- 图文分析结果与 Grad-CAM：`docs/figures/workspace-multimodal.png`
+- 缺图降级结果：`docs/figures/workspace-missing-image.png`
+- 结构化 JSON 与会话历史：`docs/figures/workspace-json-history.png`
+
+![明鉴 MVP 系统总体架构](docs/figures/architecture.png)
+
+![图文分析结果与 Grad-CAM](docs/figures/workspace-multimodal.png)
+
+> 截图为 2026-10-04 本地工作台真实运行结果，使用合成联调文本和演示图片，不代表真实新闻。架构图只展示第一版已实现链路。
 
 ## 1. 项目定位
 
@@ -50,7 +64,7 @@
 - 训练曲线显示后期验证损失上升，需要正则化、早停策略和更多真实实验；
 - 图文一致性/矛盾性显式评分仍处于后续迭代；
 - 独立干净环境、10 分钟极速复现包尚未最终锁定；
-- 演示视频尚未录制；技术文档 PDF 已导出，公开 GitHub 仓库已完成。
+- 演示视频尚未录制；19 页技术文档 PDF 已导出，公开 GitHub 仓库已完成。
 
 ## 4. 真实基线结果
 
