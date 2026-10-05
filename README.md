@@ -113,6 +113,13 @@ python -m venv .venv
 ```
 
 如果 PowerShell 禁止执行 `Activate.ps1`，不需要修改系统策略，直接使用上面的 `.\.venv\Scripts\python.exe` 即可。
+
+**Windows 常见问题**：如果 `pytest` 报 `PermissionError: [WinError 5] ... pytest-of-<用户名>`，说明本机 `%TEMP%` 下的 pytest 临时目录被其它账户创建或 ACL 异常，不是项目问题。改用独立的可写临时目录即可：
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest tests -p no:cacheprovider --basetemp="$env:TEMP\mingjian-pytest"
+```
+
 `requirements.lock` 记录的是本机验证过的精确版本（含 CUDA 12.8 的 torch/torchvision）。纯 CPU 机器请把 `torch==2.11.0+cu128`、`torchvision==0.26.0+cu128` 换成不带 `+cu128` 的对应版本。
 
 GPU 环境（本机 RTX 5060 Laptop 建议 CUDA 12.8）：

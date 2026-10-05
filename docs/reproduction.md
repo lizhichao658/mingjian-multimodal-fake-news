@@ -38,6 +38,18 @@ python -m venv .venv
 ```
 
 开发机完整环境（torch 2.11.0+cu128）验证结果：`pytest tests` 为 `60 passed`，`ruff` 为 `All checks passed!`，`smoke_test.py` 的模型前向/反向检查通过。完整路径需要下载 PyTorch，耗时会随网络和缓存变化。
+
+### 1.3 Windows 常见问题
+
+- 若 PowerShell 执行策略拦截 `Activate.ps1`（`UnauthorizedAccess`），不需要改系统策略，直接调用 `.\.venv\Scripts\python.exe`。
+- 若 `pytest` 报 `PermissionError: [WinError 5] ... pytest-of-<用户名>`，说明 `%TEMP%` 下该临时目录被其它账户创建或 ACL 异常，不是项目问题。指定独立基目录并禁用缓存插件即可绕过：
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest tests -p no:cacheprovider --basetemp="$env:TEMP\mingjian-pytest"
+```
+
+本机完整环境（torch 2.11.0+cu128）使用上述命令实测为 `60 passed`；全新评委机器通常不需要该参数。
+
 ## 2. 本地数据准备（不随仓库分发）
 
 Weibo17 原始归档只保存在本地，不允许把正文、完整 ID 列表或图片提交到 Git。准备完成后运行：
