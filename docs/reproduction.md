@@ -5,26 +5,39 @@
 
 ## 1. 10 分钟极速复现（基础路径）
 
-这条路径不下载任何模型权重，也不需要 Weibo17 原始数据。
+这条路径不下载模型权重，也不需要 Weibo17 原始数据。为避免 Windows PowerShell 的 `Activate.ps1` 执行策略问题，所有命令都直接使用虚拟环境中的 `python.exe`。
+
+### 1.1 轻量路径（不安装 PyTorch，适合快速核验）
 
 ```powershell
 cd <repo>
 python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-python -m pip install -e ".[dev]"
-python -m pytest tests
-python scripts\smoke_test.py
+.\.venv\Scripts\python.exe -m pip install --upgrade pip
+.\.venv\Scripts\python.exe -m pip install numpy==2.5.2 pandas==3.0.6 pillow==12.3.0 pytest==9.1.1 ruff==0.16.10
+.\.venv\Scripts\python.exe -m pip install -e . --no-deps
+.\.venv\Scripts\python.exe -m pytest tests
+.\.venv\Scripts\ruff.exe check src tests scripts
+.\.venv\Scripts\python.exe scripts\smoke_test.py
 ```
 
-当前验证结果（本机）：
+当前验证结果（无 PyTorch 干净环境）：
 
-- `pytest tests`：`60 passed`；
+- `pytest tests`：`25 passed, 8 skipped`；
 - `ruff check src tests scripts`：`All checks passed!`；
-- `scripts\smoke_test.py`：数据契约、配置、指标和模型前向/反向检查通过。
+- `scripts\smoke_test.py`：数据契约、配置和指标检查通过；模型前向/反向步骤显示 `SKIP: PyTorch is not installed`；
+- 8 条跳过项均为 PyTorch 相关测试，不是失败。
 
-如果只验证配置、契约和指标，不安装 PyTorch 也可以运行部分测试；模型相关测试会自动跳过。
+### 1.2 完整路径（安装锁定依赖和 PyTorch）
 
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements.lock --extra-index-url https://download.pytorch.org/whl/cu128
+.\.venv\Scripts\python.exe -m pip install -e . --no-deps
+.\.venv\Scripts\python.exe -m pytest tests
+.\.venv\Scripts\ruff.exe check src tests scripts
+.\.venv\Scripts\python.exe scripts\smoke_test.py
+```
+
+开发机完整环境（torch 2.11.0+cu128）验证结果：`pytest tests` 为 `60 passed`，`ruff` 为 `All checks passed!`，`smoke_test.py` 的模型前向/反向检查通过。完整路径需要下载 PyTorch，耗时会随网络和缓存变化。
 ## 2. 本地数据准备（不随仓库分发）
 
 Weibo17 原始归档只保存在本地，不允许把正文、完整 ID 列表或图片提交到 Git。准备完成后运行：

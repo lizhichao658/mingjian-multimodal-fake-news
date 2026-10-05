@@ -87,25 +87,32 @@
 
 ## 5. 快速开始
 
-基础测试（不要求下载模型）：
+基础测试（轻量路径，不下载 PyTorch）：
 
 ```powershell
 cd <repo>
 python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-python -m pip install -e ".[dev]"
-python -m pytest tests
-python scripts\smoke_test.py
+.\.venv\Scripts\python.exe -m pip install --upgrade pip
+.\.venv\Scripts\python.exe -m pip install numpy==2.5.2 pandas==3.0.6 pillow==12.3.0 pytest==9.1.1 ruff==0.16.10
+.\.venv\Scripts\python.exe -m pip install -e . --no-deps
+.\.venv\Scripts\python.exe -m pytest tests
+.\.venv\Scripts\ruff.exe check src tests scripts
+.\.venv\Scripts\python.exe scripts\smoke_test.py
 ```
 
-已锁定版本的复现安装（推荐用于评审复现，见 `requirements.lock`）：
+当前轻量路径实测结果：`25 passed, 8 skipped`；无 PyTorch 时模型相关测试自动跳过，`smoke_test.py` 最后一步显示 `SKIP`。
+
+已锁定版本的完整复现安装（推荐用于评审的 GPU 环境，见 `requirements.lock`）：
 
 ```powershell
-python -m pip install -r requirements.lock
-python -m pip install -e . --no-deps
+.\.venv\Scripts\python.exe -m pip install -r requirements.lock --extra-index-url https://download.pytorch.org/whl/cu128
+.\.venv\Scripts\python.exe -m pip install -e . --no-deps
+.\.venv\Scripts\python.exe -m pytest tests
+.\.venv\Scripts\ruff.exe check src tests scripts
+.\.venv\Scripts\python.exe scripts\smoke_test.py
 ```
 
+如果 PowerShell 禁止执行 `Activate.ps1`，不需要修改系统策略，直接使用上面的 `.\.venv\Scripts\python.exe` 即可。
 `requirements.lock` 记录的是本机验证过的精确版本（含 CUDA 12.8 的 torch/torchvision）。纯 CPU 机器请把 `torch==2.11.0+cu128`、`torchvision==0.26.0+cu128` 换成不带 `+cu128` 的对应版本。
 
 GPU 环境（本机 RTX 5060 Laptop 建议 CUDA 12.8）：
