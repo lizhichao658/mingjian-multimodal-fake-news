@@ -94,3 +94,22 @@ def test_http_server_exposes_health_and_analyze_api(tmp_path) -> None:
         server.shutdown()
         server.server_close()
         thread.join(timeout=5)
+
+
+def test_http_server_serves_polished_workspace_html(tmp_path) -> None:
+    server = create_server(_predictor(tmp_path), port=0)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    base_url = f"http://127.0.0.1:{server.server_address[1]}"
+    try:
+        with urllib.request.urlopen(f"{base_url}/", timeout=5) as response:
+            html = response.read().decode("utf-8")
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=5)
+
+    assert response.headers["Content-Type"].startswith("text/html")
+    assert 'data-ui="workspace"' in html
+    assert 'data-ui="verdict"' in html
+    assert 'data-ui="dropzone"' in html
