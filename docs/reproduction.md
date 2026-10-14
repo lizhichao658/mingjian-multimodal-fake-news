@@ -37,7 +37,7 @@ python -m venv .venv
 .\.venv\Scripts\python.exe scripts\smoke_test.py
 ```
 
-开发机完整环境（torch 2.11.0+cu128）验证结果：`pytest tests` 为 `60 passed`，`ruff` 为 `All checks passed!`，`smoke_test.py` 的模型前向/反向检查通过。完整路径需要下载 PyTorch，耗时会随网络和缓存变化。
+开发机完整环境（torch 2.11.0+cu128）验证结果：`pytest tests` 为 `61 passed`，`ruff` 为 `All checks passed!`，`smoke_test.py` 的模型前向/反向检查通过。完整路径需要下载 PyTorch，耗时会随网络和缓存变化。
 
 ### 1.3 Windows 常见问题
 
@@ -48,7 +48,7 @@ python -m venv .venv
 .\.venv\Scripts\python.exe -m pytest tests -p no:cacheprovider --basetemp="$env:TEMP\mingjian-pytest"
 ```
 
-本机完整环境（torch 2.11.0+cu128）使用上述命令实测为 `60 passed`；全新评委机器通常不需要该参数。
+本机完整环境（torch 2.11.0+cu128）使用上述命令实测为 `61 passed`；全新评委机器通常不需要该参数。
 
 ## 2. 本地数据准备（不随仓库分发）
 
