@@ -5,6 +5,8 @@
 > 关联提交：`5195f2b`、`53e1510`、`5c11c3e`、`4b89fb4`、`d49e12f`  
 > 核心目标：在 Weibo17 上真实训练文本 + 单图模型，输出可复核指标，并修复训练和解释器中的关键问题。
 
+> 修订说明（2026-10-14）：仅将本机绝对路径替换为占位符，其余内容未改动。
+
 ---
 
 ## 1. 初始意图
@@ -170,7 +172,7 @@ AI 建议的训练闭环：
 
 ```powershell
 .\.venv\Scripts\python.exe scripts\train_lite_baseline.py `
-  --data-dir "C:\Users\LX\Documents\Codex\2026-10-03\new-chat\work\weibo17_processed" `
+  --data-dir "<本地工作目录>\weibo17_processed" `
   --out artifacts\lite_v1 `
   --epochs 8 --batch-size 64 --lr 2e-3 `
   --num-workers 8 --device cuda
