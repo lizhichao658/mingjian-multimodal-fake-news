@@ -29,5 +29,5 @@ Invoke-Checked { & ".\.venv\Scripts\python.exe" -m pip install --upgrade pip }
 Invoke-Checked { & ".\.venv\Scripts\python.exe" -m pip install --retries 5 --timeout 60 torch torchvision --index-url https://download.pytorch.org/whl/cu128 }
 Invoke-Checked { & ".\.venv\Scripts\python.exe" -m pip install --retries 5 --timeout 60 -e ".[dev]" }
 Write-Output "CUDA 12.8 environment ready."
-Write-Output "Activate with: .\.venv\Scripts\Activate.ps1"
+Write-Output "Run .\.venv\Scripts\python.exe directly; activation is unnecessary."
 Write-Output 'Verify with: .\.venv\Scripts\python.exe -c "import torch; print(torch.cuda.is_available(), torch.cuda.get_device_name(0))"'

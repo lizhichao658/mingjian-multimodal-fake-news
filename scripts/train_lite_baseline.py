@@ -160,6 +160,10 @@ def write_predictions(
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
+    # Seed before constructing the model, not only when fitting an existing one.
+    random.seed(args.seed)
+    np.random.seed(args.seed)
+    torch.manual_seed(args.seed)
     started = time.perf_counter()
     data_dir = args.data_dir.resolve()
     out_dir = args.out.resolve()
