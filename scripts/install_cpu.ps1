@@ -7,7 +7,7 @@ param(
 $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path -Parent $PSScriptRoot
 Set-Location $repoRoot
-$environmentFullPath = [System.IO.Path]::GetFullPath($EnvironmentPath)
+$environmentFullPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($EnvironmentPath)
 if (Test-Path -LiteralPath $environmentFullPath) {
     throw "EnvironmentPath already exists. Choose a new path; existing environments are not modified."
 }
