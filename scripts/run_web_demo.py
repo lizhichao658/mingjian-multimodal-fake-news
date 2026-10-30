@@ -32,7 +32,15 @@ def main(argv: list[str] | None = None) -> int:
         device=args.device,
         image_size=args.image_size,
     )
-    server = create_server(predictor, host=args.host, port=args.port)
+    try:
+        server = create_server(predictor, host=args.host, port=args.port)
+    except OSError as exc:
+        print(
+            f"无法启动本地工作台（{args.host}:{args.port}）：{exc.strerror or exc}。"
+            "请确认端口未被占用，或通过 --port 指定其他端口。",
+            file=sys.stderr,
+        )
+        return 2
     host, port = server.server_address[:2]
     print(f"MingJian demo workspace: http://{host}:{port}")
     print("Press Ctrl+C to stop.")
