@@ -35,6 +35,15 @@ def _validate_threshold(value: float, *, name: str) -> float:
     return threshold
 
 
+def _validate_evidence_fraction(value: float, *, name: str, upper: float, inclusive: bool) -> float:
+    fraction = float(value)
+    valid = 0.0 <= fraction <= upper if inclusive else 0.0 <= fraction < upper
+    if not valid:
+        bracket = "[0, 1]" if inclusive else f"[0, {upper})"
+        raise ValueError(f"{name} must be in {bracket}")
+    return fraction
+
+
 @dataclass
 class LitePredictor:
     """Load one lite checkpoint and expose a compact explanation API."""
@@ -116,6 +125,8 @@ class LitePredictor:
         sample_id: str = "",
         top_k: int = 12,
         decision_threshold: float | None = None,
+        min_strength: float = 0.1,
+        min_coherence: float = 0.1,
     ) -> dict[str, Any]:
         """Analyze one text/image pair and return JSON-ready evidence."""
 
@@ -123,6 +134,18 @@ class LitePredictor:
             self.decision_threshold
             if decision_threshold is None
             else _validate_threshold(decision_threshold, name="decision_threshold")
+        )
+        active_min_strength = _validate_evidence_fraction(
+            min_strength,
+            name="min_strength",
+            upper=0.5,
+            inclusive=False,
+        )
+        active_min_coherence = _validate_evidence_fraction(
+            min_coherence,
+            name="min_coherence",
+            upper=1.0,
+            inclusive=True,
         )
         image = None
         if image_path is not None and str(image_path).strip():
@@ -134,6 +157,8 @@ class LitePredictor:
             image_size=self.image_size,
             threshold=active_threshold,
             top_k=top_k,
+            min_strength=active_min_strength,
+            min_coherence=active_min_coherence,
         )
         result = explainer.explain(text, image=image, sample_id=sample_id or "adhoc")
         result["model"] = {
@@ -142,6 +167,10 @@ class LitePredictor:
             "device": str(self.device),
             "image_size": self.image_size,
             "image_provided": image is not None,
+            "evidence_card_thresholds": {
+                "min_strength": active_min_strength,
+                "min_coherence": active_min_coherence,
+            },
             "metadata": self.metadata,
         }
         return result

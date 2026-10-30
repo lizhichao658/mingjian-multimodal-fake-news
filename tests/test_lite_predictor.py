@@ -60,6 +60,18 @@ def test_lite_predictor_loads_checkpoint_and_explains_missing_image(tmp_path) ->
     assert override["model"]["decision_threshold"] == 0.4
     assert override["decision"]["threshold"] == 0.4
 
+    custom = predictor.analyze(
+        "abc",
+        min_strength=0.2,
+        min_coherence=0.3,
+    )
+    assert custom["model"]["evidence_card_thresholds"] == {
+        "min_strength": 0.2,
+        "min_coherence": 0.3,
+    }
+    assert custom["evidence_card"]["cross_modal"]["min_strength"] == 0.2
+    assert custom["evidence_card"]["cross_modal"]["min_coherence"] == 0.3
+
 
 def test_lite_predictor_loads_local_image(tmp_path) -> None:
     checkpoint = _write_checkpoint(tmp_path)
