@@ -25,6 +25,7 @@ data/processed/
 data/demo/generated/
 artifacts/
 checkpoints/
+weibo.zip
 *.pt
 *.pth
 *.safetensors
